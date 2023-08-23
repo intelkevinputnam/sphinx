@@ -4930,7 +4930,8 @@ class Symbol:
                              "Declaration is '.. cpp:%s:: %s'.")
                     msg = msg % (ourChild.docname, ourChild.line,
                                  ourChild.declaration.directiveType, name)
-                    logger.warning(msg, location=(otherChild.docname, otherChild.line))
+                    if not self.config.cpp_suppress_duplicate_warnings:
+                        logger.warning(msg, location=(otherChild.docname, otherChild.line))
                 else:
                     if (otherChild.declaration.objectType ==
                             ourChild.declaration.objectType and
@@ -7424,7 +7425,8 @@ class CPPObject(ObjectDescription[ASTDeclaration]):
                      "Declaration is '.. cpp:%s:: %s'.")
             msg = msg % (e.symbol.docname, e.symbol.line,
                          self.display_object_type, sig)
-            logger.warning(msg, location=signode)
+            if not self.config.cpp_suppress_duplicate_warnings:
+                logger.warning(msg, location=signode)
 
         if ast.objectType == 'enumerator':
             self._add_enumerator_to_parent(ast)
@@ -8213,6 +8215,7 @@ def setup(app: Sphinx) -> dict[str, Any]:
     app.add_config_value("cpp_id_attributes", [], 'env')
     app.add_config_value("cpp_paren_attributes", [], 'env')
     app.add_config_value("cpp_maximum_signature_line_length", None, 'env', types={int, None})
+    app.add_config_value("cpp_suppress_duplicate_warnings", False, '')
     app.add_post_transform(AliasTransform)
 
     # debug stuff
